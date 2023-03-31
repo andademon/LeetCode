@@ -57,14 +57,11 @@ var minWindow = function(s, t) {
             min.len = right - left;
             min.left = left;
             min.right = right - 1;
+            hashMap_window[s[left]]--;
             left++;
-            right = left;
-            hashMap_window = {};
-            continue;
         }else{
+            hashMap_window[s[left]]--;
             left++;
-            right = left;
-            hashMap_window = {};
         }
     }
     if(min.len > s.length) return "";
