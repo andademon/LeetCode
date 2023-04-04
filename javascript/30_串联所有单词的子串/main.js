@@ -5,107 +5,93 @@
  */
 
 /**
- * 我第一个想到的就是字典树
+ * 哈希表?
  */
 
-class TrieNode {
-    constructor(value){
-        this.value = (value === undefined ? null : value);
-        this.son = [];
+function contain(map1,map2){
+    for(key in map1){
+        if(map1[key] == map2[key]) continue;
+        else return false;
     }
-    findNode(value){
-        for(let i = 0;i < this.son.length;i++){
-            const node = this.son[i];
-            if(node.value === value){
-                return node;
-            }
-        }
-        return null;
-    }
-}
-
-class Trie {
-    constructor(){
-        this.root = new TrieNode();
-        this.sign = 0;
-    }
-    insert(str){
-        let node  = this.root;
-        for(let i = 0;i < str.length;i++){
-            let snode = node.findNode(str[i]);
-            if(snode == null){
-                snode = new TrieNode(str[i]);
-                node.son.push(snode);
-            }
-            node = snode;
-        }
-    }
-    has(str){
-        let node = this.root;
-        for(let i = 0;i < str.length;i++){
-            const snode = node.findNode(str[i]);
-            if(snode){
-                node = snode;
-            }else{
-                return false;
-            }
-        }
-        return true;
-    }
-    remove(str){
-        let node = this.root;
-        for(let i = 0;i < str.length;i++){
-            for(let j = 0;j < node.son.length;j++){
-                if(node.son[j].value === str[i]){
-                    let snode = node.son[j];
-                    if(snode.son.length === 1){
-                        delete node.son[j];
-                        return
-                    }
-                    node = snode;
-                    break;
-                }
-            }
-        }
-    }
+    return true;
 }
 
 var findSubstring = function(s, words) {
+    let map1 = {};//map1维护的是words数组中所有子串
+    let map2 = {};//map2维护的是当前子串包含的words数组中元素及个数
     let len = words[0].length;
+    let deque = [];//双端队列充当滑动窗口
     let rs = [];
-    let trie = new Trie();
-    let i = 0;
     for(let i = 0;i < words.length;i++){
-        trie.insert(words[i]);
+        map1[words[i]] == undefined ? map1[words[i]] = 1 : map1[words[i]]++;
     }
-    while(i < s.length){
-        if(trie.root.son.length === 0){
-            rs.push(i-len*words.length);
-            trie = new Trie();
-            for(let i = 0;i < words.length;i++){
-                trie.insert(words[i]);
-            }
-        }
-        let temp = s.slice(i,i+len);
-        if(trie.has(temp)){
-            trie.remove(temp);
-            trie.sign = 1;
-            i = i + len;
+    let i = 0;
+    while(i <= s.length){
+        if(deque.length < len){
+            deque.push(s[i]);
+            i++;
             continue;
         }else{
-            if(trie.sign === 1){//说明字典树已经被修改了，要重新建立
-                trie = new Trie();
-                for(let i = 0;i < words.length;i++){
-                    trie.insert(words[i]);
+            let key = deque.join("");
+            if(map1[key] != undefined && (map2[key] == undefined || map2[key] < map1[key])){ 
+                map2[key] == undefined ? map2[key] = 1 : map2[key]++;
+                if(contain(map1,map2)){
+                    rs.push(i - len * words.length);
+                    // let start = i - len * words.length;
+                    // let first_key = "";
+                    // for(let j = start;j < start + len;j++){
+                    //     first_key += s[j];
+                    // }
+                    // map2[first_key]--;
+                    map2 = {};
+                    i = i - len * words.length + 1;
                 }
+                deque = [];
+                continue;
+            }else{
+                if(map2[key] != undefined){
+                    // map2 = {};
+                    // map2[key] = 1;
+                    // deque = [];
+                    let count = 0;
+                    for(key in map2){
+                        count += map2[key];
+                    }
+                    map2 = {}
+                    deque = [];
+                    i -= len * (count + 1) - 1;
+                    // console.log(i)
+                    continue;
+                }
+                let count = 0;
+                for(key in map2){
+                    count += map2[key];
+                }
+                i -= len * (count + 1) - 1;
+                map2 = {};
+                deque = [];
             }
-            i++;
         }
     }
     return rs;
 };
 
-let s = "barfoothefoobarman";
-let words = ["foo","bar"];
+// let s = "barfoothefoobarman";
+
+// let s = "barfoofoobarthefoobarman";
+
+// let s = "wordgoodgoodgoodbestword";
+
+// let words = ["foo","bar"];
+
+// let words = ["bar","foo","the"];
+
+// let words = ["word","good","best","good"];
+
+// let s = "ababaab";
+
+let s = "abaababbaba";
+
+let words = ["ab","ab","ba","ba"];
 
 console.log(findSubstring(s,words))
