@@ -75,4 +75,8 @@ let tree = {
     }
 }
 
-console.log(flatten(tree))
+// console.log(flatten(tree))
+
+// let r = tree.right;
+// tree.right = null;
+// console.log(r)
