@@ -15,7 +15,7 @@ class ListNode{
  * @param {ListNode} head
  * @return {boolean}
  */
-//额外空间
+//额外O(n)空间
 // var hasCycle = function(head) {
 //     let node = head;
 //     while(node){
@@ -27,7 +27,7 @@ class ListNode{
 //     return false;
 // };
 
-//快慢指针
+//快慢指针,额外O(1)空间
 var hasCycle = function(head) {
     if(head == null || head.next == null) return false;
     let slow = head;
