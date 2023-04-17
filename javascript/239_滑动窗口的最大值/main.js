@@ -160,25 +160,49 @@ class MaxDeque{
  * 单调队列：如果你35岁是个p6，发现组里社招了个28岁的p7，那你就永无出头之日，可以滚粗了
  */
 
-
 //单调队列，超出时间限制
-var maxSlidingWindow = function(nums, k) {
+var maxSlidingWindow = function(nums, k) {//把小于改为小于等于就过了
     let deque = [];
     let rs = [];
     for(let i = 0;i < k;i++){
-        while(deque.length != 0 && deque[deque.length - 1].num < nums[i]){
+        while(deque.length != 0 && deque[deque.length - 1].num <= nums[i]){
             deque.pop();
         }
         deque.push({num:nums[i],index:i});
     }
     rs.push(deque[0].num);
     for(let i = k;i < nums.length;i++){
-        while(deque.length != 0 && deque[deque.length - 1].num < nums[i]){
+        while(deque.length != 0 && deque[deque.length - 1].num <= nums[i]){
             deque.pop();
         }
         deque.push({num:nums[i],index:i});
-        if(i - k + 1> deque[0].index) deque.shift();
+        while(i - k + 1> deque[0].index){
+            deque.shift();
+        }
         rs.push(deque[0].num);
+    }
+    return rs;
+};
+
+var maxSlidingWindow = function(nums, k) {
+    let deque = [];//只存下标
+    let rs = [];
+    for(let i = 0;i < k;i++){
+        while(deque.length != 0 && nums[i] >= nums[deque[deque.length - 1]]){
+            deque.pop();
+        }
+        deque.push(i);
+    }
+    rs.push(nums[deque[0]]);
+    for(let i = k;i < nums.length;i++){
+        while(deque.length != 0 && nums[i] >= nums[deque[deque.length - 1]]){
+            deque.pop();
+        }
+        deque.push(i);
+        while(deque[0] <= i - k){
+            deque.shift();
+        }
+        rs.push(nums[deque[0]]);
     }
     return rs;
 };
