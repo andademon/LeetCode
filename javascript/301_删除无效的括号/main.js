@@ -4,21 +4,38 @@
  */
 
 //判断字符串是否合法
-function isValid(str){
-    let deque = [...str];
-    let stack = [];
-    while(deque.length > 0){
-        let temp = deque.shift();
-        if(temp == '(') stack.push('(');
-        if(temp == ')'){
-            if(stack.length > 0){
-                stack.pop();
-                continue;
-            }else return false;
+// function isValid(str){
+//     let deque = [...str];
+//     let stack = [];
+//     while(deque.length > 0){
+//         let temp = deque.shift();
+//         if(temp == '(') stack.push('(');
+//         if(temp == ')'){
+//             if(stack.length > 0){
+//                 stack.pop();
+//                 continue;
+//             }else return false;
+//         }
+//     }
+//     if(deque.length == 0 && stack.length == 0) return true;
+//     return false;
+// }
+
+const isValid = (str) => {
+    let count = 0;
+
+    for (const c of str) {
+        if (c === '(') {
+            count++;
+        } else if (c === ')') {
+            count--;
+            if (count < 0) {
+                return false;
+            }
         }
     }
-    if(deque.length == 0 && stack.length == 0) return true;
-    return false;
+
+    return count === 0;
 }
 
 //广度优先搜索
@@ -33,6 +50,8 @@ function bfs(s){
     }
     if(set.size != 0) return set;
 
+    let deque_set = new Set(...deque);
+    deque = [...deque_set];
     let tempSet = new Set();
     while(deque.length != 0){
         tempSet = bfs(deque.shift());
