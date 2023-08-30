@@ -33,7 +33,7 @@ function bfs(s){
     let rs = new Set();
     while(deque.length){
         let temp = deque.shift();
-        if(map[temp] === 1) continue;
+        if(map[temp] === 1) continue;//过滤重复处理的字符串
         else map[temp] = 1;
         let [set,sign] = getSet(temp);
         if(sign){
