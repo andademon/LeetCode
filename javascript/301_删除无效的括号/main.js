@@ -2,28 +2,17 @@
  * @param {string} s
  * @return {string[]}
  */
+var removeInvalidParentheses = function(s) {
+    if(isValid(s)) return [s];//如果s本身就合法，就直接返回s，否则说明至少也要删除一个元素，则调用BFS算法
+    let set = bfs(s);
+    let rs = [...set];
+    return rs;
+};
 
-//判断字符串是否合法
-// function isValid(str){
-//     let deque = [...str];
-//     let stack = [];
-//     while(deque.length > 0){
-//         let temp = deque.shift();
-//         if(temp == '(') stack.push('(');
-//         if(temp == ')'){
-//             if(stack.length > 0){
-//                 stack.pop();
-//                 continue;
-//             }else return false;
-//         }
-//     }
-//     if(deque.length == 0 && stack.length == 0) return true;
-//     return false;
-// }
 
+//双指针判断括号字符串是否合法，没有额外空间开销
 const isValid = (str) => {
     let count = 0;
-
     for (const c of str) {
         if (c === '(') {
             count++;
@@ -34,62 +23,70 @@ const isValid = (str) => {
             }
         }
     }
-
     return count === 0;
 }
 
 //广度优先搜索
 function bfs(s){
-    let set = new Set();//避免结果重复
-    let deque = [];//用于保存队列方便广度优先搜索
-    for(let i = 0;i < s.length;i++){
-        if(s[i] != '(' && s[i] != ')') continue;//如果这个数是其他字符直接跳过
-        let tempStr = s.slice(0,i) + s.slice(i + 1);
-        if(isValid(tempStr)) set.add(tempStr);
-        else deque.push(tempStr);
-    }
-    if(set.size != 0) return set;
-
-    let deque_set = new Set(...deque);
-    deque = [...deque_set];
-    let tempSet = new Set();
-    while(deque.length != 0){
-        tempSet = bfs(deque.shift());
-        if(tempSet.size != 0){
-            tempSet.forEach(s => {
-                set.add(s);
+    let map = {};
+    let deque = [s];
+    let rs = new Set();
+    while(deque.length){
+        let temp = deque.shift();
+        if(map[temp] === 1) continue;
+        else map[temp] = 1;
+        let [set,sign] = getSet(temp);
+        if(sign){
+            set.forEach(e => {
+                rs.add(e);
+            })
+            break;
+        }else{
+            set.forEach(e => {
+                deque.push(e);
             })
         }
     }
-    return set;
+    while(deque.length){
+        let temp = deque.shift();
+        let [set,sign] = getSet(temp);
+        if(sign) set.forEach(e => {rs.add(e)});
+    }
+    return rs;
 }
 
-//广度优先算法
-var removeInvalidParentheses = function(s) {
-    if(isValid(s)) return [s];//如果s本身就合法，就直接返回s，否则说明至少也要删除一个元素，则调用BFS算法
-    let set = bfs(s);
-    let rs = [...set];
+function getSet(s){
+    let validSet = new Set();
+    let invalidSet = new Set();
+    for(let i = 0;i < s.length;i++){
+        if(s[i] != '(' && s[i] != ')') continue;//如果这个数是其他字符直接跳过
+        let temp = s.slice(0,i) + s.slice(i + 1);
+        if(isValid(temp)) validSet.add(temp);
+        else invalidSet.add(temp);
+    }
+    if(validSet.size > 0) return [validSet,true];
+    else return [invalidSet,false];
+}
+
+function filterLength(set){
+    let array = [...set];
     let max = 0;
-    for(let i = 0;i < rs.length;i++){
-        if(rs[i].length > max) max = rs[i].length;
+    for(let i = 0;i < array.length;i++){
+        if(array[i].length > max) max = array[i].length;
     }
-    if(rs.length > 0) rs = rs.filter(s => s.length == max)
-    return rs;
-};
-
-function test(){
-    let i = 1;
-    let rs = 1;
-    while(i <= 25){
-        rs *= i;
-        i++;
-    }
+    if(array.length > 0) array = array.filter(s => s.length == max)
+    let rs = new Set();
+    array.forEach(e => {
+        rs.add(e);
+    })
     return rs;
 }
 
-// console.log(isValid("(((()a)((a)())a"))
-
-let s = ")()(";
+// let s = ")()(f";
+// let s = ")(v)((m(())()(";
+// let s = "(())()()))()()";
+// let s = "())v)(()(((((())";
+let s = "())v)(()(((((())";
 console.log(removeInvalidParentheses(s));
 
 
@@ -102,3 +99,5 @@ console.log(removeInvalidParentheses(s));
 
 // console.log("hello".slice(0,0) + "hello".slice(1))
 // console.log("hello".slice(0,4) + "hello".slice(5))
+
+//通过，但是低分
